@@ -57,7 +57,7 @@ Make sure to have python version 3 install on you pc or laptop.
 <br>
 **Clone repository**
 <br>
-`git_link`
+`https://github.com/OleksiiMartseniuk/Blog.git`
 
 2. ## Installing dependencies
 
