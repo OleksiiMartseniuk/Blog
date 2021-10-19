@@ -1,0 +1,55 @@
+{% extends 'blog/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}{{post.title}}{% endblock %}
+
+{% block content %}
+    <h1>{{post.title}}</h1>
+    <hr>
+    <p class="text-secondary">Published {{ post.publish }} by {{ post.author }}</p>
+    <p>{{post.body|linebreaks}}</p>
+    <p>
+        <a href="{% url 'post_share' post.id %}">Share this post</a>
+    </p>
+    <h2>Similar Posts</h2>
+    <hr>
+    {% for similar_post in similar_posts %}
+        <a href="{{similar_post.get_absolute_url}}">{{similar_post.title}}</a>
+        <br>
+    {% endfor %}
+    {% with comments.count as total_comments %}
+        <hr>
+        <h2>{{total_comments}} Comment{{total_comments|pluralize}}</h2>
+        <hr>
+    {% endwith %}
+
+    <div class="list-group">
+        <ul>
+            {% for comment in comments %}
+                <li class="list-group-item list-group-item-action mt-3">
+                    <div class="d-flex w-100 justify-content-between">
+                      <p class="mb-1">Comment {{ forloop.counter }} by {{ comment.name }}</p>
+                      <small>{{comment.created}}</small>
+                    </div>
+                    <h5 class="mb-1">{{comment.body|linebreaks}}</h5>
+                </li>
+            {% empty %}
+                <p>There are no comments yet.</p>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if new_comment %}
+        <h4>Your comment has been added.</h4>
+    {% else %}
+         <hr>
+        <h2>Add a new comment</h2>
+
+        <form action="" method="post">
+            {{comment_form|crispy}}
+            {% csrf_token %}
+            <button class="btn btn-success mt-2" type="submit">Add comment</button>
+        </form>
+    {% endif %}
+{% endblock %}
