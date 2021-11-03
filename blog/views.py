@@ -15,7 +15,8 @@ def post_list(request, tag_slug=None):
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
         object_list = object_list.filter(tags__in=[tag])
-    paginator = Paginator(object_list, 3) # По 3 статьи на каждую страницу
+    # По 3 статьи на каждую страницу
+    paginator = Paginator(object_list, 3)
     page = request.GET.get('page')
     try:
         posts = paginator.page(page)
@@ -23,7 +24,8 @@ def post_list(request, tag_slug=None):
         # Если страница не является целым числом, возврящает первую
         posts = paginator.page(1)
     except EmptyPage:
-        # Если номер страницы больше, чем общее количество страниц, возвращаем последнюю.
+        # Если номер страницы больше, чем общее количество страниц,
+        # возвращаем последнюю.
         posts = paginator.page(paginator.num_pages)
     context = {
         'posts': posts,
@@ -55,8 +57,11 @@ def post_detail(request, year, month, day, post_slug):
         comment_form = CommentForm()
     # Формирование списка похожих статей.
     post_tags_ids = post.tags.values_list('id', flat=True)
-    similar_posts = Post.objects.filter(tags__in=post_tags_ids).exclude(id=post.id)
-    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
+    similar_posts = Post.objects.filter(tags__in=post_tags_ids
+                                        ).exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')
+                                           ).order_by('-same_tags',
+                                                      '-publish')[:4]
     context = {
         'post': post,
         'comments': comments,
@@ -77,10 +82,13 @@ def post_share(request, post_id):
         if form.is_valid():
             cd = form.cleaned_data
             # Отправка электронной почты.
-            # Полученная абсолютная ссылка будет со-держать HTTP-схему и имя хоста.
+            # Полученная абсолютная ссылка будет
+            # со-держать HTTP-схему и имя хоста.
             post_url = request.build_absolute_uri(post.get_absolute_url())
-            subject = f"{cd['name']} ({cd['email']}) recommends you reading '{post.title}'"
-            message = f"Read '{post.title}' at {post_url}\n\n{cd['name']}\'s comments:{cd['comments']}"
+            subject = f"{cd['name']} ({cd['email']}) recommends you reading\
+                '{post.title}'"
+            message = f"Read '{post.title}' at {post_url}\n\n{cd['name']}\'s\
+                comments:{cd['comments']}"
             send_mail(subject, message, 'martsenyk.l@gmail.com', [cd['to']])
             sent = True
     else:
